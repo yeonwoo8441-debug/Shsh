@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="robots" content="noindex,nofollow">
+<title>Zeta AI - ログイン / 新規登録</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:#0f0f1a;color:#e0e0e0;
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;min-height:100dvh;padding:16px;
+  -webkit-font-smoothing:antialiased;
+}
+.container{
+  background:#1a1a2e;border:1px solid #2a2a4a;border-radius:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  width:100%;max-width:460px;padding:32px 28px;
+  position:relative;
+}
+.logo{text-align:center;margin-bottom:20px}
+.logo h1{font-size:22px;font-weight:700;color:#fff}
+.logo h1 span{color:#7c6ff7}
+
+/* Language switcher */
+.lang-switch{position:absolute;top:16px;right:20px;display:flex;gap:4px}
+.lang-switch button{
+  background:none;border:1px solid #333;border-radius:4px;
+  color:#888;font-size:11px;padding:3px 8px;cursor:pointer;
+  transition:all .2s;-webkit-tap-highlight-color:transparent;
+}
+.lang-switch button.active{color:#7c6ff7;border-color:#7c6ff7}
+.lang-switch button:focus-visible{outline:2px solid #7c6ff7;outline-offset:1px}
+
+/* Social buttons */
+.social-row{display:flex;gap:10px;margin-bottom:20px}
+.social-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 0;font-size:14px;font-weight:500;
+  background:#12121f;border:1px solid #333;border-radius:8px;
+  color:#e0e0e0;cursor:pointer;transition:background .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.social-btn:hover{background:#1e1e35;border-color:#555}
+.social-btn:focus-visible{outline:2px solid #7c6ff7;outline-offset:2px}
+.social-btn svg{width:18px;height:18px;flex-shrink:0}
+.divider{
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;
+  color:#555;font-size:12px;
+}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#2a2a4a}
+
+/* Tabs */
+.tabs{display:flex;margin-bottom:24px;border-bottom:1px solid #2a2a4a}
+.tabs button{
+  flex:1;padding:12px;border:none;background:none;
+  font-size:15px;font-weight:600;cursor:pointer;
+  color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .2s,border-color .2s;-webkit-tap-highlight-color:transparent;
+}
+.tabs button.active{color:#7c6ff7;border-bottom-color:#7c6ff7}
+.tabs button:focus-visible{outline:2px solid #7c6ff7;outline-offset:-2px;border-radius:4px}
+.panel{display:none}
+.panel.active{display:block}
+
+/* Fields */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:14px;font-weight:500;margin-bottom:6px;color:#ccc}
+.field label .req{color:#f44}
+.input-wrap{position:relative}
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="text"]{
+  width:100%;padding:12px 14px;font-size:16px;
+  background:#12121f;border:1.5px solid #333;border-radius:8px;
+  color:#fff;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+}
+.field input:focus{outline:none;border-color:#7c6ff7;box-shadow:0 0 0 3px rgba(124,111,247,.2)}
+.field input:not(:placeholder-shown):not(:focus):invalid{border-color:#f44}
+.field input:not(:placeholder-shown):not(:focus):valid{border-color:#4caf50}
+.err{font-size:13px;color:#f66;margin-top:4px;display:none}
+.err.show{display:block}
+.match-ok{font-size:13px;color:#4caf50;margin-top:4px;display:none}
+.match-ok.show{display:block}
+.match-err{font-size:13px;color:#f66;margin-top:4px;display:none}
+.match-err.show{display:block}
+.toggle-pw{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:18px;color:#888;padding:4px;
+  -webkit-tap-highlight-color:transparent;
+}
+.toggle-pw:focus-visible{outline:2px solid #7c6ff7;border-radius:4px}
+.caps-warn{font-size:12px;color:#f5a623;margin-top:4px;display:none}
+.caps-warn.show{display:block}
+.pw-hint{font-size:12px;color:#777;margin-top:4px}
+
+/* Password strength meter */
+.strength-wrap{margin-top:8px}
+.strength-bar{display:flex;gap:4px;margin-bottom:6px}
+.strength-bar .seg{
+  flex:1;height:4px;border-radius:2px;background:#333;
+  transition:background .3s;
+}
+.strength-bar .seg.s1{background:#f44}
+.strength-bar .seg.s2{background:#f5a623}
+.strength-bar .seg.s3{background:#4caf50}
+.strength-bar .seg.s4{background:#00c853}
+.strength-label{font-size:11px;color:#888;min-height:14px}
+.pw-checklist{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.pw-checklist span{font-size:11px;color:#666;transition:color .2s}
+.pw-checklist span.pass{color:#4caf50}
+.pw-checklist span.pass::before{content:"✓ "}
+.pw-checklist span:not(.pass)::before{content:"○ "}
+
+/* Forgot password */
+.forgot-row{display:flex;justify-content:flex-end;margin-top:-10px;margin-bottom:14px}
+.forgot-row a{font-size:13px;color:#7c6ff7;text-decoration:none}
+.forgot-row a:hover{text-decoration:underline}
+.forgot-row a:focus-visible{outline:2px solid #7c6ff7;outline-offset:2px;border-radius:2px}
+
+/* Checkbox */
+.check-field{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.check-field input[type="checkbox"]{width:18px;height:18px;accent-color:#7c6ff7}
+.check-field label{font-size:14px;color:#aaa;cursor:pointer}
+.check-field label a{color:#7c6ff7;text-decoration:none}
+
+/* Button */
+.btn{
+  width:100%;padding:14px;font-size:16px;font-weight:600;
+  color:#fff;background:linear-gradient(135deg,#7c6ff7,#5a4fd4);
+  border:none;border-radius:8px;cursor:pointer;
+  transition:opacity .2s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn:hover{opacity:.9}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible{outline:2px solid #7c6ff7;outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .6s linear infinite;display:none;
+}
+.btn.loading .spinner{display:block}
+.btn.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Success */
+.success{
+  text-align:center;padding:12px;background:rgba(76,175,80,.15);
+  color:#4caf50;border-radius:8px;margin-bottom:16px;display:none;
+}
+.success.show{display:block}
+
+/* Toast */
+.toast-container{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;
+}
+.toast{
+  padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;
+  color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.3);
+  animation:toastIn .3s ease;max-width:320px;
+}
+.toast.success{background:#2e7d32}
+.toast.error{background:#c62828}
+.toast.info{background:#1565c0}
+.toast.out{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(12px)}}
+
+/* Honeypot - hidden from users */
+.hp-field{
+  position:absolute;left:-9999px;top:-9999px;
+  width:1px;height:1px;overflow:hidden;
+  opacity:0;pointer-events:none;
+}
+
+/* Footer */
+.footer{text-align:center;margin-top:20px;font-size:12px;color:#555}
+.footer a{color:#7c6ff7;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Language Switcher -->
+  <div class="lang-switch" role="group" aria-label="Language">
+    <button type="button" data-lang="ja" class="active">JA</button>
+    <button type="button" data-lang="ko">KO</button>
+    <button type="button" data-lang="en">EN</button>
+  </div>
+
+  <div class="logo"><h1><span>Zeta</span> AI</h1></div>
+
+  <!-- Social Login (top per 2026 UX trend) -->
+  <div class="social-row">
+    <button type="button" class="social-btn" data-provider="google" aria-label="Google">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      <span data-i18n="google">Google</span>
+    </button>
+    <button type="button" class="social-btn" data-provider="apple" aria-label="Apple">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      <span data-i18n="apple">Apple</span>
+    </button>
+    <button type="button" class="social-btn" data-provider="github" aria-label="GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <span data-i18n="github">GitHub</span>
+    </button>
+  </div>
+
+  <div class="divider"><span data-i18n="or">または</span></div>
+
+  <!-- Tabs -->
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" id="t-login" class="active" aria-selected="true" aria-controls="p-login" data-i18n="login">ログイン</button>
+    <button type="button" role="tab" id="t-signup" aria-selected="false" aria-controls="p-signup" data-i18n="signup">新規登録</button>
+  </div>
+
+  <!-- ====== LOGIN ====== -->
+  <div class="panel active" id="p-login" role="tabpanel" aria-labelledby="t-login">
+    <div class="success" id="login-ok" data-i18n="login_success">ログインに成功しました！</div>
+    <form id="loginForm" method="POST" action="/api/auth/login" novalidate>
+      <!-- Honeypot -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="hp-company">Company</label>
+        <input type="text" id="hp-company" name="company" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="le" data-i18n="email">メールアドレス</label>
+        <div class="input-wrap">
+          <input type="email" id="le" name="email" autocomplete="username"
+                 spellcheck="false" autocapitalize="off" required placeholder=" "
+                 aria-required="true" aria-describedby="le-err">
+        </div>
+        <p class="err" id="le-err" role="alert" data-i18n="err_email">メールアドレスを入力してください。</p>
+      </div>
+      <div class="field">
+        <label for="lp" data-i18n="password">パスワード</label>
+        <div class="input-wrap">
+          <input type="password" id="lp" name="password" autocomplete="current-password"
+                 required placeholder=" " aria-required="true" aria-describedby="lp-err">
+          <button type="button" class="toggle-pw" data-target="lp" aria-label="toggle">👁</button>
+        </div>
+        <p class="err" id="lp-err" role="alert" data-i18n="err_pw">パスワードを入力してください。</p>
+        <p class="caps-warn" id="lp-caps" data-i18n="caps">⚠ Caps Lock がオンです</p>
+      </div>
+
+      <div class="forgot-row">
+        <a href="/api/auth/forgot" data-i18n="forgot">パスワードをお忘れですか？</a>
+      </div>
+
+      <div class="check-field">
+        <input type="checkbox" id="lr" name="remember">
+        <label for="lr" data-i18n="remember">ログイン状態を保持</label>
+      </div>
+
+      <button type="submit" class="btn" id="login-btn">
+        <span class="spinner"></span>
+        <span class="btn-text" data-i18n="login_btn">ログイン</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- ====== SIGNUP ====== -->
+  <div class="panel" id="p-signup" role="tabpanel" aria-labelledby="t-signup">
+    <div class="success" id="signup-ok" data-i18n="signup_success">登録が完了しました！</div>
+    <form id="signupForm" method="POST" action="/api/auth/signup" novalidate>
+      <!-- Honeypot -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="hp-url">Website</label>
+        <input type="text" id="hp-url" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="sn" data-i18n="name">お名前</label>
+        <div class="input-wrap">
+          <input type="text" id="sn" name="name" autocomplete="name"
+                 required minlength="2" maxlength="50" placeholder=" "
+                 aria-required="true" aria-describedby="sn-err">
+        </div>
+        <p class="err" id="sn-err" role="alert" data-i18n="err_name">お名前は2文字以上入力してください。</p>
+      </div>
+      <div class="field">
+        <label for="se" data-i18n="email">メールアドレス</label>
+        <div class="input-wrap">
+          <input type="email" id="se" name="email" autocomplete="email"
+                 spellcheck="false" autocapitalize="off" required placeholder=" "
+                 aria-required="true" aria-describedby="se-err">
+        </div>
+        <p class="err" id="se-err" role="alert" data-i18n="err_email_valid">正しいメールアドレスを入力してください。</p>
+      </div>
+      <div class="field">
+        <label for="sp" data-i18n="password">パスワード</label>
+        <div class="input-wrap">
+          <input type="password" id="sp" name="password" autocomplete="new-password"
+                 required minlength="8" placeholder=" "
+                 aria-required="true" aria-describedby="sp-hint sp-err">
+          <button type="button" class="toggle-pw" data-target="sp spc" aria-label="toggle">👁</button>
+        </div>
+        <!-- Strength Meter -->
+        <div class="strength-wrap">
+          <div class="strength-bar" id="strength-bar">
+            <div class="seg" id="seg1"></div>
+            <div class="seg" id="seg2"></div>
+            <div class="seg" id="seg3"></div>
+            <div class="seg" id="seg4"></div>
+          </div>
+          <div class="strength-label" id="strength-label"></div>
+          <div class="pw-checklist" id="pw-checklist">
+            <span data-check="len" data-i18n="chk_len">8+ chars</span>
+            <span data-check="upper" data-i18n="chk_upper">A-Z</span>
+            <span data-check="lower" data-i18n="chk_lower">a-z</span>
+            <span data-check="digit" data-i18n="chk_digit">0-9</span>
+            <span data-check="special" data-i18n="chk_special">!@#$</span>
+          </div>
+        </div>
+        <p class="pw-hint" id="sp-hint" data-i18n="pw_hint">8文字以上、大文字+小文字+数字を含む</p>
+        <p class="err" id="sp-err" role="alert" data-i18n="err_pw_rule">パスワードは8文字以上、大文字・小文字・数字を含む必要があります。</p>
+        <p class="caps-warn" id="sp-caps" data-i18n="caps">⚠ Caps Lock がオンです</p>
+      </div>
+
+      <!-- Password Confirm (Issue #5) -->
+      <div class="field">
+        <label for="spc" data-i18n="pw_confirm">パスワード確認</label>
+        <div class="input-wrap">
+          <input type="password" id="spc" name="password_confirm" autocomplete="new-password"
+                 required placeholder=" " aria-required="true" aria-describedby="spc-err">
+        </div>
+        <p class="match-ok" id="spc-ok" data-i18n="match_ok">✓ パスワードが一致しています</p>
+        <p class="match-err" id="spc-mismatch" role="alert" data-i18n="match_err">✗ パスワードが一致しません</p>
+        <p class="err" id="spc-err" role="alert" data-i18n="err_pw_confirm">パスワード確認を入力してください。</p>
+      </div>
+
+      <div class="check-field">
+        <input type="checkbox" id="st" name="terms" required aria-describedby="st-err">
+        <label for="st"><a href="/terms" target="_blank" rel="noopener" data-i18n="terms">利用規約</a>に同意する <span class="req">*</span></label>
+      </div>
+      <p class="err" id="st-err" role="alert" style="margin-bottom:12px" data-i18n="err_terms">利用規約に同意してください。</p>
+
+      <div class="check-field">
+        <input type="checkbox" id="s2fa" name="enable_2fa">
+        <label for="s2fa" data-i18n="2fa">2段階認証を有効にする</label>
+      </div>
+
+      <button type="submit" class="btn" id="signup-btn">
+        <span class="spinner"></span>
+        <span class="btn-text" data-i18n="signup_btn">新規登録</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="footer">
+    <a href="/privacy" data-i18n="privacy">プライバシーポリシー</a> · <a href="/terms" data-i18n="terms2">利用規約</a>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ I18N ============ */
+var i18n={
+  ja:{
+    login:"ログイン",signup:"新規登録",login_btn:"ログイン",signup_btn:"新規登録",
+    email:"メールアドレス",password:"パスワード",name:"お名前",pw_confirm:"パスワード確認",
+    remember:"ログイン状態を保持",forgot:"パスワードをお忘れですか？",
+    terms:"利用規約",terms2:"利用規約",privacy:"プライバシーポリシー",
+    or:"または",google:"Google",apple:"Apple",github:"GitHub",
+    login_success:"ログインに成功しました！",signup_success:"登録が完了しました！",
+    err_email:"メールアドレスを入力してください。",err_email_valid:"正しいメールアドレスを入力してください。",
+    err_pw:"パスワードを入力してください。",err_pw_rule:"パスワードは8文字以上、大文字・小文字・数字を含む必要があります。",
+    err_name:"お名前は2文字以上入力してください。",err_pw_confirm:"パスワード確認を入力してください。",
+    err_terms:"利用規約に同意してください。",
+    caps:"⚠ Caps Lock がオンです",
+    match_ok:"✓ パスワードが一致しています",match_err:"✗ パスワードが一致しません",
+    pw_hint:"8文字以上、大文字+小文字+数字を含む",
+    chk_len:"8+ chars",chk_upper:"A-Z",chk_lower:"a-z",chk_digit:"0-9",chk_special:"!@#$",
+    strength_weak:"弱い",strength_med:"普通",strength_good:"良い",strength_strong:"非常に強い",
+    processing:"処理中...",toast_error:"送信に失敗しました",toast_bot:"アクセスが拒否されました",
+    "2fa":"2段階認証を有効にする"
+  },
+  ko:{
+    login:"로그인",signup:"회원가입",login_btn:"로그인",signup_btn:"회원가입",
+    email:"이메일",password:"비밀번호",name:"이름",pw_confirm:"비밀번호 확인",
+    remember:"로그인 상태 유지",forgot:"비밀번호를 잊으셨나요?",
+    terms:"이용약관",terms2:"이용약관",privacy:"개인정보처리방침",
+    or:"또는",google:"Google",apple:"Apple",github:"GitHub",
+    login_success:"로그인 성공!",signup_success:"회원가입 완료!",
+    err_email:"이메일을 입력해 주세요.",err_email_valid:"올바른 이메일을 입력해 주세요.",
+    err_pw:"비밀번호를 입력해 주세요.",err_pw_rule:"비밀번호는 8자 이상, 대소문자+숫자 포함.",
+    err_name:"이름은 2자 이상 입력해 주세요.",err_pw_confirm:"비밀번호 확인을 입력해 주세요.",
+    err_terms:"이용약관에 동의해 주세요.",
+    caps:"⚠ Caps Lock 이 켜져 있습니다",
+    match_ok:"✓ 비밀번호가 일치합니다",match_err:"✗ 비밀번호가 일치하지 않습니다",
+    pw_hint:"8자 이상, 대문자+소문자+숫자 포함",
+    chk_len:"8자+",chk_upper:"A-Z",chk_lower:"a-z",chk_digit:"0-9",chk_special:"!@#$",
+    strength_weak:"약함",strength_med:"보통",strength_good:"양호",strength_strong:"매우 강함",
+    processing:"처리 중...",toast_error:"전송에 실패했습니다",toast_bot:"접근이 거부되었습니다",
+    "2fa":"2단계 인증 활성화"
+  },
+  en:{
+    login:"Sign In",signup:"Sign Up",login_btn:"Sign In",signup_btn:"Sign Up",
+    email:"Email",password:"Password",name:"Name",pw_confirm:"Confirm Password",
+    remember:"Remember me",forgot:"Forgot password?",
+    terms:"Terms",terms2:"Terms",privacy:"Privacy Policy",
+    or:"or",google:"Google",apple:"Apple",github:"GitHub",
+    login_success:"Login successful!",signup_success:"Account created!",
+    err_email:"Please enter your email.",err_email_valid:"Please enter a valid email.",
+    err_pw:"Please enter your password.",err_pw_rule:"Min 8 chars, uppercase + lowercase + number.",
+    err_name:"Name must be at least 2 characters.",err_pw_confirm:"Please confirm your password.",
+    err_terms:"Please accept the terms.",
+    caps:"⚠ Caps Lock is on",
+    match_ok:"✓ Passwords match",match_err:"✗ Passwords do not match",
+    pw_hint:"Min 8 chars, uppercase + lowercase + number",
+    chk_len:"8+ chars",chk_upper:"A-Z",chk_lower:"a-z",chk_digit:"0-9",chk_special:"!@#$",
+    strength_weak:"Weak",strength_med:"Fair",strength_good:"Good",strength_strong:"Very Strong",
+    processing:"Processing...",toast_error:"Submission failed",toast_bot:"Access denied",
+    "2fa":"Enable 2FA"
+  }
+};
+var currentLang="ja";
+
+function setLang(lang){
+  currentLang=lang;
+  document.documentElement.lang=lang;
+  var dict=i18n[lang];
+  var els=document.querySelectorAll("[data-i18n]");
+  for(var i=0;i<els.length;i++){
+    var key=els[i].getAttribute("data-i18n");
+    if(dict[key])els[i].textContent=dict[key];
+  }
+  var btns=document.querySelectorAll(".lang-switch button");
+  for(var j=0;j<btns.length;j++){
+    btns[j].className=btns[j].getAttribute("data-lang")===lang?"active":"";
+  }
+  try{localStorage.setItem("zeta_lang",lang)}catch(e){}
+}
+
+var langBtns=document.querySelectorAll(".lang-switch button");
+for(var li=0;li<langBtns.length;li++)(function(btn){
+  btn.addEventListener("click",function(){setLang(btn.getAttribute("data-lang"))});
+})(langBtns[li]);
+
+// Restore saved lang
+try{var saved=localStorage.getItem("zeta_lang");if(saved&&i18n[saved])setLang(saved)}catch(e){}
+
+/* ============ TABS ============ */
+var tL=document.getElementById("t-login"),tS=document.getElementById("t-signup");
+var pL=document.getElementById("p-login"),pS=document.getElementById("p-signup");
+function tab(login){
+  tL.className=login?"active":"";tS.className=login?"":"active";
+  tL.setAttribute("aria-selected",login);tS.setAttribute("aria-selected",!login);
+  pL.className=login?"panel active":"panel";pS.className=login?"panel":"panel active";
+}
+tL.addEventListener("click",function(){tab(true)});
+tS.addEventListener("click",function(){tab(false)});
+
+/* ============ TOAST ============ */
+function toast(msg,type){
+  var c=document.getElementById("toasts");
+  var t=document.createElement("div");
+  t.className="toast "+(type||"info");
+  t.textContent=msg;
+  c.appendChild(t);
+  setTimeout(function(){t.className+=" out";setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t)},300)},3500);
+}
+
+/* ============ PASSWORD TOGGLE ============ */
+var toggles=document.querySelectorAll(".toggle-pw");
+for(var i=0;i<toggles.length;i++)(function(btn){
+  btn.addEventListener("click",function(){
+    var ids=btn.getAttribute("data-target").split(" ");
+    for(var k=0;k<ids.length;k++){
+      var inp=document.getElementById(ids[k]);
+      inp.type=inp.type==="password"?"text":"password";
+    }
+    var first=document.getElementById(ids[0]);
+    btn.textContent=first.type==="password"?"\uD83D\uDC41":"\uD83D\uDE48";
+  });
+})(toggles[i]);
+
+/* ============ CAPS LOCK ============ */
+function caps(id,wid){
+  var inp=document.getElementById(id),w=document.getElementById(wid);
+  inp.addEventListener("keyup",function(e){
+    if(e.getModifierState)w.className=e.getModifierState("CapsLock")?"caps-warn show":"caps-warn";
+  });
+  inp.addEventListener("blur",function(){w.className="caps-warn"});
+}
+caps("lp","lp-caps");caps("sp","sp-caps");
+
+/* ============ STRENGTH METER ============ */
+var sp=document.getElementById("sp");
+var segs=[document.getElementById("seg1"),document.getElementById("seg2"),document.getElementById("seg3"),document.getElementById("seg4")];
+var sLabel=document.getElementById("strength-label");
+var checklist=document.querySelectorAll("#pw-checklist span");
+
+function updateStrength(){
+  var v=sp.value;
+  var checks={
+    len:v.length>=8,
+    upper:/[A-Z]/.test(v),
+    lower:/[a-z]/.test(v),
+    digit:/\d/.test(v),
+    special:/[^A-Za-z0-9]/.test(v)
+  };
+  var score=0;
+  for(var k in checks)if(checks[k])score++;
+  if(v.length>=12)score+=0.5;
+  if(v.length>=16)score+=0.5;
+
+  // Update checklist
+  for(var ci=0;ci<checklist.length;ci++){
+    var ck=checklist[ci].getAttribute("data-check");
+    checklist[ci].className=checks[ck]?"pass":"";
+  }
+
+  // Update bar
+  var level=0;
+  if(v.length>0){
+    if(score<=2)level=1;
+    else if(score<=3)level=2;
+    else if(score<=4)level=3;
+    else level=4;
+  }
+  var colors=["s1","s2","s3","s4"];
+  var labels=["strength_weak","strength_med","strength_good","strength_strong"];
+  for(var si=0;si<4;si++){
+    segs[si].className="seg"+(si<level?" "+colors[level-1]:"");
+  }
+  sLabel.textContent=level?i18n[currentLang][labels[level-1]]:"";
+}
+sp.addEventListener("input",updateStrength);
+
+/* ============ VALIDATION ============ */
+var emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+var pwRe=/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+
+function showErr(inp,eid){inp.setAttribute("aria-invalid","true");document.getElementById(eid).className="err show"}
+function hideErr(inp,eid){inp.removeAttribute("aria-invalid");document.getElementById(eid).className="err"}
+
+function vEmail(v){return v.trim()!==""&&emailRe.test(v)}
+function vPw(v){return v.length>=8&&pwRe.test(v)}
+function vName(v){return v.trim().length>=2}
+
+var fields=[
+  {id:"le",eid:"le-err",fn:vEmail},
+  {id:"lp",eid:"lp-err",fn:function(v){return v!==""}},
+  {id:"sn",eid:"sn-err",fn:vName},
+  {id:"se",eid:"se-err",fn:vEmail},
+  {id:"sp",eid:"sp-err",fn:vPw},
+  {id:"spc",eid:"spc-err",fn:function(v){return v!==""}}
+];
+for(var j=0;j<fields.length;j++)(function(f){
+  var inp=document.getElementById(f.id);
+  inp.addEventListener("blur",function(){
+    if(!f.fn(inp.value))showErr(inp,f.eid);else hideErr(inp,f.eid);
+  });
+  inp.addEventListener("input",function(){
+    if(inp.getAttribute("aria-invalid")&&f.fn(inp.value))hideErr(inp,f.eid);
+  });
+})(fields[j]);
+
+/* ============ PASSWORD MATCH (Issue #5) ============ */
+var spc=document.getElementById("spc");
+var spcOk=document.getElementById("spc-ok");
+var spcMis=document.getElementById("spc-mismatch");
+
+function checkMatch(){
+  var v1=sp.value,v2=spc.value;
+  if(v2===""){spcOk.className="match-ok";spcMis.className="match-err";spc.style.borderColor="";return}
+  if(v1===v2){
+    spcOk.className="match-ok show";spcMis.className="match-err";spc.style.borderColor="#4caf50";
+  }else{
+    spcOk.className="match-ok";spcMis.className="match-err show";spc.style.borderColor="#f44";
+  }
+}
+sp.addEventListener("input",checkMatch);
+spc.addEventListener("input",checkMatch);
+
+/* ============ FORM DRAFT AUTOSAVE ============ */
+var draftKey="zeta_draft";
+function saveDraft(){
+  try{
+    var d={
+      name:document.getElementById("sn").value,
+      email:document.getElementById("se").value
+    };
+    if(d.name||d.email)localStorage.setItem(draftKey,JSON.stringify(d));
+  }catch(e){}
+}
+function loadDraft(){
+  try{
+    var d=JSON.parse(localStorage.getItem(draftKey)||"{}");
+    if(d.name)document.getElementById("sn").value=d.name;
+    if(d.email)document.getElementById("se").value=d.email;
+  }catch(e){}
+}
+function clearDraft(){
+  try{localStorage.removeItem(draftKey)}catch(e){}
+}
+document.getElementById("sn").addEventListener("input",saveDraft);
+document.getElementById("se").addEventListener("input",saveDraft);
+loadDraft();
+
+/* ============ HONEYPOT CHECK ============ */
+function isBot(form){
+  var hp=form.querySelector(".hp-field input");
+  return hp&&hp.value!=="";
+}
+
+/* ============ SUBMIT ============ */
+function submit(formId,okId,checks,extra){
+  var form=document.getElementById(formId);
+  var btn=form.querySelector(".btn");
+  var ok=document.getElementById(okId);
+  var btnText=btn.querySelector(".btn-text");
+  var origText=btnText.textContent;
+
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+
+    // Honeypot
+    if(isBot(form)){
+      toast(i18n[currentLang].toast_bot,"error");
+      return;
+    }
+
+    ok.className="success";
+    var valid=true;
+
+    for(var k=0;k<checks.length;k++){
+      var c=checks[k];
+      if(!c.fn(document.getElementById(c.id).value)){
+        showErr(document.getElementById(c.id),c.eid);
+        valid=false;
+        if(k===0)document.getElementById(c.id).focus();
+        break;
+      }else hideErr(document.getElementById(c.id),c.eid);
+    }
+
+    // Password match final check
+    if(formId==="signupForm"&&valid){
+      if(sp.value!==spc.value){
+        spcMis.className="match-err show";
+        spc.setAttribute("aria-invalid","true");
+        spc.style.borderColor="#f44";
+        valid=false;
+      }
+    }
+
+    if(extra&&!extra())valid=false;
+    if(!valid)return;
+
+    // Loading state
+    btn.disabled=true;
+    btn.classList.add("loading");
+    btnText.textContent=i18n[currentLang].processing;
+
+    var data=new FormData(form);
+    // Remove honeypot from payload
+    data.delete("company");
+    data.delete("website");
+
+    fetch(form.getAttribute("action"),{
+      method:"POST",
+      body:data,
+      credentials:"same-origin",
+      headers:{"X-Requested-With":"XMLHttpRequest"}
+    }).then(function(r){
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      return r.json();
+    }).then(function(res){
+      ok.textContent=res.message||i18n[currentLang].(formId==="loginForm"?"login_success":"signup_success");
+      ok.className="success show";
+      form.reset();
+      spcOk.className="match-ok";spcMis.className="match-err";spc.style.borderColor="";
+      updateStrength();
+      clearDraft();
+      toast(i18n[currentLang].(formId==="loginForm"?"login_success":"signup_success"),"success");
+    }).catch(function(err){
+      toast(i18n[currentLang].toast_error+": "+err.message,"error");
+    }).finally(function(){
+      btn.disabled=false;
+      btn.classList.remove("loading");
+      btnText.textContent=origText;
+    });
+  });
+}
+
+submit("loginForm","login-ok",[
+  {id:"le",eid:"le-err",fn:vEmail},
+  {id:"lp",eid:"lp-err",fn:function(v){return v!==""}}
+]);
+
+submit("signupForm","signup-ok",[
+  {id:"sn",eid:"sn-err",fn:vName},
+  {id:"se",eid:"se-err",fn:vEmail},
+  {id:"sp",eid:"sp-err",fn:vPw},
+  {id:"spc",eid:"spc-err",fn:function(v){return v!==""}}
+],function(){
+  var t=document.getElementById("st");
+  if(!t.checked){document.getElementById("st-err").className="err show";t.setAttribute("aria-invalid","true");return false}
+  document.getElementById("st-err").className="err";t.removeAttribute("aria-invalid");return true;
+});
+
+document.getElementById("st").addEventListener("change",function(){
+  if(this.checked){document.getElementById("st-err").className="err";this.removeAttribute("aria-invalid")}
+});
+
+/* ============ SOCIAL LOGIN (stub) ============ */
+var socialBtns=document.querySelectorAll(".social-btn");
+for(var sbi=0;sbi<socialBtns.length;sbi++)(function(btn){
+  btn.addEventListener("click",function(){
+    var provider=btn.getAttribute("data-provider");
+    // Replace with actual OAuth redirect:
+    // window.location.href = "/api/auth/oauth/" + provider;
+    toast(provider+" OAuth → /api/auth/oauth/"+provider,"info");
+  });
+})(socialBtns[sbi]);
+
+})();
+</script>
+</body>
+</html>   
